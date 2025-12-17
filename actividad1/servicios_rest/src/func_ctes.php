@@ -38,7 +38,7 @@ function obtener_producto_por_id($cod) {
     }
 
     try {
-        $consulta = "select * from producto where cod = ?";
+        $consulta = "select producto.*, familia.nombre as nombre_familia from producto join familia on producto.familia = familia.cod where producto.cod = ?";
         $sentencia = $conexion->prepare($consulta);
         $sentencia->execute([$cod]);
     } catch (PDOException $e) {

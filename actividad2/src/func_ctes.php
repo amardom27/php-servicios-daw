@@ -1,0 +1,31 @@
+<?php
+const API_TIENDA = "http://localhost/proyectos/servicios_web/actividad1/servicios_rest";
+
+function consumir_servicios_REST($url, $metodo, $datos = null) {
+    $llamada = curl_init();
+
+    curl_setopt($llamada, CURLOPT_URL, $url);
+    curl_setopt($llamada, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($llamada, CURLOPT_CUSTOMREQUEST, $metodo);
+
+    if (isset($datos)) {
+        curl_setopt($llamada, CURLOPT_POSTFIELDS, http_build_query($datos));
+    }
+
+    $respuesta = curl_exec($llamada);
+    $llamada = null; // curl_close esta deprecated
+
+    return $respuesta;
+}
+
+function error_page($title, $body) {
+    return '<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>' . $title . '</title>
+</head>
+<body>' . $body . '</body>
+</html>';
+}
