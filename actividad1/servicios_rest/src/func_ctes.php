@@ -1,5 +1,70 @@
 <?php
 const NOMBRE_BD = "bd_tienda";
+const TIEMPO_INACTIVIDAD = 10; // minutos
+
+function login($usuario, $clave) {
+    try {
+        $conexion = new PDO("mysql:host=" . SERVIDOR . ";dbname=" . NOMBRE_BD, USUARIO, CLAVE, array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES 'utf8'"));
+    } catch (PDOException $e) {
+        $respuesta["error_bd"] = "En la conexion a la BD: " . $e->getMessage();
+        return $respuesta;
+    }
+
+    try {
+        $consulta = "select * from usuarios where usuario = ? and clave = ?";
+        $sentencia = $conexion->prepare($consulta);
+        $sentencia->execute([$usuario, $clave]);
+    } catch (PDOException $e) {
+        // Hay que cerrar la sentencia tambien (siempre !!)
+        $sentencia = null;
+        $conexion = null;
+        $respuesta["error_bd"] = "En la consulta a la BD: " . $e->getMessage();
+        return $respuesta;
+    }
+
+    if ($sentencia->rowCount() > 0) {
+        $respuesta["usuario"] = $sentencia->fetch(PDO::FETCH_ASSOC);
+    } else {
+        $respuesta["mensaje"] = "El usuario no se encuentra en la BD";
+    }
+
+    $sentencia = null;
+    $conexion = null;
+
+    return $respuesta;
+}
+
+function logueado($id) {
+    try {
+        $conexion = new PDO("mysql:host=" . SERVIDOR . ";dbname=" . NOMBRE_BD, USUARIO, CLAVE, array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES 'utf8'"));
+    } catch (PDOException $e) {
+        $respuesta["error_bd"] = "En la conexion a la BD: " . $e->getMessage();
+        return $respuesta;
+    }
+
+    try {
+        $consulta = "select * from usuarios where id_usuario = ?";
+        $sentencia = $conexion->prepare($consulta);
+        $sentencia->execute([$id]);
+    } catch (PDOException $e) {
+        // Hay que cerrar la sentencia tambien (siempre !!)
+        $sentencia = null;
+        $conexion = null;
+        $respuesta["error_bd"] = "En la consulta a la BD: " . $e->getMessage();
+        return $respuesta;
+    }
+
+    if ($sentencia->rowCount() > 0) {
+        $respuesta["usuario"] = $sentencia->fetch(PDO::FETCH_ASSOC);
+    } else {
+        $respuesta["mensaje"] = "El usuario no se encuentra en la BD";
+    }
+
+    $sentencia = null;
+    $conexion = null;
+
+    return $respuesta;
+}
 
 function obtener_productos() {
     try {

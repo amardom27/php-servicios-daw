@@ -7,6 +7,18 @@ require "src/func_ctes.php";
 
 $app = new \Slim\App;
 
+$app->post("/login", function ($request) {
+    $usuario = $request->getParam("usuario");
+    // La clave tiene que venir ya encriptada (eleccion propia) 
+    $clave = $request->getParam("clave");
+    echo json_encode(login($usuario, $clave));
+});
+
+$app->post("/logueado", function ($request) {
+    $id = $request->getParam("id");
+    echo json_encode(logueado($id));
+});
+
 $app->get("/productos", function () {
     echo json_encode(obtener_productos());
 });
