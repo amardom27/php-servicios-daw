@@ -15,10 +15,35 @@ $app->post("/login", function ($request) {
     echo json_encode(login($usuario, $clave));
 });
 
-$app->post("/logueado", function ($request) {
+$app->get("/logueado", function ($request) {
     $id = $request->getParam("id");
 
     echo json_encode(logueado($id));
+});
+
+$app->get("/horarioProfesor/{id_usuario}", function ($request) {
+    $id_usuario = $request->getAttribute("id_usuario");
+
+    echo json_encode(getHorarioProfesorById($id_usuario));
+});
+
+$app->get("/horarioGrupo/{id_grupo}", function ($request) {
+    $id_grupo = $request->getAttribute("id_grupo");
+
+    echo json_encode(getHorarioProfesorByGrupo($id_grupo));
+});
+
+$app->get("/grupos", function ($request) {
+
+    echo json_encode(getGrupos());
+});
+
+$app->get("/profesoresLibres/{dia}/{hora}/{id_grupo}", function ($request) {
+    $dia = $request->getAttribute("dia");
+    $hora = $request->getAttribute("hora");
+    $id_grupo = $request->getAttribute("id_grupo");
+
+    echo json_encode(horarios_profesores_libres($dia, $hora, $id_grupo));
 });
 
 $app->get('/saludo/{codigo}', function ($request) {
