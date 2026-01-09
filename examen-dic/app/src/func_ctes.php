@@ -1,6 +1,22 @@
 <?php
 const API_HORARIOS = "http://localhost/proyectos/servicios_web/examen-dic/servicios_rest";
 const TIEMPO_INAC = 10; // minutos
+const HORAS = [
+    1 => "8:15 - 9:15",
+    "9:15 - 10:15",
+    "10:15 - 11:15",
+    "11:15 - 11:45",
+    "11:45 - 12:45",
+    "12:45 - 13:45",
+    "13:45 - 14:45"
+];
+const DIAS = [
+    1 => "Lunes",
+    "Martes",
+    "Miércoles",
+    "Jueves",
+    "Viernes"
+];
 
 function consumir_servicios_REST($url, $metodo, $datos = null) {
     $llamada = curl_init();

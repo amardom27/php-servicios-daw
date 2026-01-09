@@ -65,7 +65,7 @@ function logueado($id) {
     return $respuesta;
 }
 
-function getHorarioProfesorById($id_usuario) {
+function horario_profesor_id($id_usuario) {
     try {
         $conexion = new PDO("mysql:host=" . SERVIDOR . ";dbname=" . NOMBRE_BD, USUARIO, CLAVE, array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES 'utf8'"));
     } catch (PDOException $e) {
@@ -74,9 +74,9 @@ function getHorarioProfesorById($id_usuario) {
     }
 
     try {
-        $consulta = "select dia, hora, grupos.nombre as grupo, aulas.nombre as aula 
+        $consulta = "select dia, hora, grupos.nombre as grupo, aulas.nombre as aula
         from horario_lectivo
-            join grupos on horario_lectivo.grupo = grupos.id_grupo 
+            join grupos on horario_lectivo.grupo = grupos.id_grupo
             join aulas on horario_lectivo.aula = aulas.id_aula
         where horario_lectivo.usuario = ?";
         $sentencia = $conexion->prepare($consulta);
@@ -98,7 +98,7 @@ function getHorarioProfesorById($id_usuario) {
     return $respuesta;
 }
 
-function getHorarioProfesorByGrupo($id_grupo) {
+function horario_profesor_grupo($id_grupo) {
     try {
         $conexion = new PDO("mysql:host=" . SERVIDOR . ";dbname=" . NOMBRE_BD, USUARIO, CLAVE, array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES 'utf8'"));
     } catch (PDOException $e) {
@@ -107,7 +107,7 @@ function getHorarioProfesorByGrupo($id_grupo) {
     }
 
     try {
-        $consulta = "select dia, hora, usuarios.nombre as usuario, aulas.nombre as aula 
+        $consulta = "select dia, hora, usuarios.usuario as usuario, aulas.nombre as aula
         from horario_lectivo
             join aulas on horario_lectivo.aula = aulas.id_aula
             join usuarios on horario_lectivo.usuario = usuarios.id_usuario
@@ -131,7 +131,7 @@ function getHorarioProfesorByGrupo($id_grupo) {
     return $respuesta;
 }
 
-function getGrupos() {
+function grupos() {
     try {
         $conexion = new PDO("mysql:host=" . SERVIDOR . ";dbname=" . NOMBRE_BD, USUARIO, CLAVE, array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES 'utf8'"));
     } catch (PDOException $e) {

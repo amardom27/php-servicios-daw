@@ -24,18 +24,17 @@ $app->get("/logueado", function ($request) {
 $app->get("/horarioProfesor/{id_usuario}", function ($request) {
     $id_usuario = $request->getAttribute("id_usuario");
 
-    echo json_encode(getHorarioProfesorById($id_usuario));
+    echo json_encode(horario_profesor_id($id_usuario));
 });
 
 $app->get("/horarioGrupo/{id_grupo}", function ($request) {
     $id_grupo = $request->getAttribute("id_grupo");
 
-    echo json_encode(getHorarioProfesorByGrupo($id_grupo));
+    echo json_encode(horario_profesor_grupo($id_grupo));
 });
 
 $app->get("/grupos", function ($request) {
-
-    echo json_encode(getGrupos());
+    echo json_encode(grupos());
 });
 
 $app->get("/profesoresLibres/{dia}/{hora}/{id_grupo}", function ($request) {

@@ -2,7 +2,7 @@
 $url = API_HORARIOS . "/logueado";
 $datos_login["id"] = $_SESSION["logueado"];
 
-$respuesta = consumir_servicios_REST($url, "POST", $datos_login);
+$respuesta = consumir_servicios_REST($url, "GET", $datos_login);
 $json_logueado = json_decode($respuesta, true);
 
 // Error en la respuesta
