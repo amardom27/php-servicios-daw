@@ -47,6 +47,14 @@ foreach ($json_hor_prof["horario"] as $hor) {
         th {
             background-color: lightgray;
         }
+
+        .enlace {
+            background: none;
+            border: none;
+            text-decoration: underline;
+            cursor: pointer;
+            color: blue;
+        }
     </style>
 </head>
 
@@ -54,7 +62,7 @@ foreach ($json_hor_prof["horario"] as $hor) {
     <h1>Examen Dic Servicios</h1>
     <form action="index.php" method="post">
         Bienvenido <strong><?= $usu_log["nombre"] ?></strong> -
-        <button type="submit" name="btnSalir">Salir</button>
+        <button class="enlace" type="submit" name="btnSalir">Salir</button>
     </form>
 
     <h2>Su horario</h2>

@@ -33,8 +33,20 @@ $app->get("/horarioGrupo/{id_grupo}", function ($request) {
     echo json_encode(horario_profesor_grupo($id_grupo));
 });
 
-$app->get("/grupos", function ($request) {
+$app->get("/grupos", function () {
     echo json_encode(grupos());
+});
+
+$app->get("/aulas", function () {
+    echo json_encode(aulas());
+});
+
+$app->get("/profesores/{dia}/{hora}/{id_grupo}", function ($request) {
+    $dia = $request->getAttribute("dia");
+    $hora = $request->getAttribute("hora");
+    $id_grupo = $request->getAttribute("id_grupo");
+
+    echo json_encode(horarios_profesores_grupo($dia, $hora, $id_grupo));
 });
 
 $app->get("/profesoresLibres/{dia}/{hora}/{id_grupo}", function ($request) {
@@ -43,6 +55,25 @@ $app->get("/profesoresLibres/{dia}/{hora}/{id_grupo}", function ($request) {
     $id_grupo = $request->getAttribute("id_grupo");
 
     echo json_encode(horarios_profesores_libres($dia, $hora, $id_grupo));
+});
+
+$app->delete("/borrarProfesor/{dia}/{hora}/{id_grupo}/{id_usuario}", function ($request) {
+    $dia = $request->getAttribute("dia");
+    $hora = $request->getAttribute("hora");
+    $id_grupo = $request->getAttribute("id_grupo");
+    $id_usuario = $request->getAttribute("id_usuario");
+
+    echo json_encode(borrar_profesor($dia, $hora, $id_grupo, $id_usuario));
+});
+
+$app->post("/agregarProfesor/{dia}/{hora}/{id_grupo}/{id_usuario}/{id_aula}", function ($request) {
+    $dia = $request->getAttribute("dia");
+    $hora = $request->getAttribute("hora");
+    $id_grupo = $request->getAttribute("id_grupo");
+    $id_usuario = $request->getAttribute("id_usuario");
+    $id_aula = $request->getAttribute("id_aula");
+
+    echo json_encode(agregar_profesor($dia, $hora, $id_grupo, $id_usuario, $id_aula));
 });
 
 $app->get('/saludo/{codigo}', function ($request) {

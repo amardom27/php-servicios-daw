@@ -78,7 +78,11 @@ if (isset($_POST["btnLogin"])) {
         </p>
         <button type="submit" name="btnLogin">Login</button>
     </form>
-
+    <?php
+    if (isset($_SESSION["seguridad"])) {
+        echo "<p class='info'>" . $_SESSION["seguridad"] . "</p>";
+    }
+    ?>
 </body>
 
 </html>
