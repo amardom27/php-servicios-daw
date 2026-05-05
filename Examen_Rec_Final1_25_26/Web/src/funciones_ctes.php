@@ -1,6 +1,13 @@
 <?php
 define("DIR_SERV", "http://localhost/proyectos/servicios_web/Examen_Rec_Final1_25_26/servicios_rest");
 define("MINUTOS", 15); // 2
+const DIAS = [
+    1 => "Lunes",
+    "Martes",
+    "Miércoles",
+    "Jueves",
+    "Viernes"
+];
 
 function consumir_servicios_REST($url, $metodo, $datos = null) {
     $llamada = curl_init();
