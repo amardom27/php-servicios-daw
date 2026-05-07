@@ -96,7 +96,6 @@ for ($i = 1; $i <= 7; $i++) {
         <?php
         foreach (HORAS as $i => $hora) {
 
-
             echo "<tr>";
             echo "<th>" . $hora . "</th>";
 
@@ -115,10 +114,8 @@ for ($i = 1; $i <= 7; $i++) {
                         echo $value["nombre"] . " <br>";
                     }
                 }
-
                 echo "</td>";
             }
-
             echo "</tr>";
         }
         ?>
