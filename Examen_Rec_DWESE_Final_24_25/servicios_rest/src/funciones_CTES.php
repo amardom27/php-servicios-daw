@@ -174,7 +174,7 @@ function get_horario_grupo($id_aula) {
     return $respuesta;
 }
 
-function get_profesores($dia, $hora, $id_aula) {
+function get_profesores_aula($dia, $hora, $id_aula) {
     try {
         $conexion = new PDO("mysql:host=" . SERVIDOR_BD . ";dbname=" . NOMBRE_BD, USUARIO_BD, CLAVE_BD, array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES 'utf8'"));
     } catch (PDOException $e) {
@@ -194,6 +194,58 @@ function get_profesores($dia, $hora, $id_aula) {
     }
 
     $respuesta["profesores_aula"] = $sentencia->fetchAll(PDO::FETCH_ASSOC);
+
+    $sentencia = null;
+    $conexion = null;
+    return $respuesta;
+}
+
+function get_profesores() {
+    try {
+        $conexion = new PDO("mysql:host=" . SERVIDOR_BD . ";dbname=" . NOMBRE_BD, USUARIO_BD, CLAVE_BD, array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES 'utf8'"));
+    } catch (PDOException $e) {
+        $respuesta["error"] = "No he podido conectarse a la base de batos: " . $e->getMessage();
+        return $respuesta;
+    }
+
+    try {
+        $consulta = "select id_usuario, usuario from usuarios";
+        $sentencia = $conexion->prepare($consulta);
+        $sentencia->execute([]);
+    } catch (PDOException $e) {
+        $sentencia = null;
+        $conexion = null;
+        $respuesta["error"] = "No he podido realizarse la consulta: " . $e->getMessage();
+        return $respuesta;
+    }
+
+    $respuesta["profesores"] = $sentencia->fetchAll(PDO::FETCH_ASSOC);
+
+    $sentencia = null;
+    $conexion = null;
+    return $respuesta;
+}
+
+function get_grupos() {
+    try {
+        $conexion = new PDO("mysql:host=" . SERVIDOR_BD . ";dbname=" . NOMBRE_BD, USUARIO_BD, CLAVE_BD, array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES 'utf8'"));
+    } catch (PDOException $e) {
+        $respuesta["error"] = "No he podido conectarse a la base de batos: " . $e->getMessage();
+        return $respuesta;
+    }
+
+    try {
+        $consulta = "select * from grupos";
+        $sentencia = $conexion->prepare($consulta);
+        $sentencia->execute([]);
+    } catch (PDOException $e) {
+        $sentencia = null;
+        $conexion = null;
+        $respuesta["error"] = "No he podido realizarse la consulta: " . $e->getMessage();
+        return $respuesta;
+    }
+
+    $respuesta["grupos"] = $sentencia->fetchAll(PDO::FETCH_ASSOC);
 
     $sentencia = null;
     $conexion = null;

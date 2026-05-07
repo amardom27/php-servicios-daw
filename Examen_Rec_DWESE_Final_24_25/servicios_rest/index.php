@@ -80,7 +80,7 @@ $app->get('/profesores/{dia}/{hora}/{id_aula}', function ($request) {
 
     $test = validateToken();
 
-    if (!is_array($test) || $test["usuario"]["tipo"] !== "normal") {
+    if (!is_array($test) || $test["usuario"]["tipo"] !== "admin") {
         echo json_encode(["no_auth" => "No tienes permiso para usar el servicio"]);
         return;
     }
@@ -89,7 +89,31 @@ $app->get('/profesores/{dia}/{hora}/{id_aula}', function ($request) {
     $hora = $request->getAttribute("hora");
     $id_aula = $request->getAttribute("id_aula");
 
-    echo json_encode(get_profesores($dia, $hora, $id_aula));
+    echo json_encode(get_profesores_aula($dia, $hora, $id_aula));
+});
+
+$app->get('/profesores', function ($request) {
+
+    $test = validateToken();
+
+    if (!is_array($test) || $test["usuario"]["tipo"] !== "admin") {
+        echo json_encode(["no_auth" => "No tienes permiso para usar el servicio"]);
+        return;
+    }
+
+    echo json_encode(get_profesores());
+});
+
+$app->get('/grupos', function ($request) {
+
+    $test = validateToken();
+
+    if (!is_array($test) || $test["usuario"]["tipo"] !== "admin") {
+        echo json_encode(["no_auth" => "No tienes permiso para usar el servicio"]);
+        return;
+    }
+
+    echo json_encode(get_grupos());
 });
 
 $app->run();

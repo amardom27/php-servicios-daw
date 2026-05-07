@@ -36,7 +36,29 @@ if (isset($_POST["aula"])) {
     if (isset($_POST["btnEditar"])) {
 
         $headers[] = "Authorization: Bearer " . $_SESSION["token"];
-        $url = DIR_SERV . "/profesores/" . $_POST["dia"] . "/" . $_POST["hora"] . "/" . $_POST["aula"];
+        $url = DIR_SERV . "/profesores" . "/" . $_POST["dia"] . "/" . $_POST["hora"] . "/" . $_POST["aula"];
+        $respuesta = consumir_servicios_JWT_REST($url, "GET", $headers);
+        $json_profesores_aula = json_decode($respuesta, true);
+
+        if (!$json_profesores_aula) {
+            session_destroy();
+            die(error_page("Examen Rec Final PHP", "<h1>Examen Rec Final PHP</h1><p>Error consumiendo el servicio Rest: <strong>" . $url . "</strong></p>"));
+        }
+        if (isset($json_profesores_aula["error"])) {
+            session_destroy();
+            die(error_page("Examen Rec Final PHP", "<h1>Examen Rec Final PHP</h1><p>" . $json_profesores_aula["error"] . "</p>"));
+        }
+        if (isset($json_profesores_aula["no_auth"])) {
+            session_unset();
+            $_SESSION["mensaje_seguridad"] = "El tiempo de sesión de la API ha expirado";
+            header("Location:index.php");
+            exit;
+        }
+
+        $profesores_aula = $json_profesores_aula["profesores_aula"];
+
+        $headers[] = "Authorization: Bearer " . $_SESSION["token"];
+        $url = DIR_SERV . "/profesores";
         $respuesta = consumir_servicios_JWT_REST($url, "GET", $headers);
         $json_profesores = json_decode($respuesta, true);
 
@@ -55,8 +77,31 @@ if (isset($_POST["aula"])) {
             exit;
         }
 
-        $profesores = $json_profesores["profesores_aula"];
-        var_dump($profesores);
+        $profesores = $json_profesores["profesores"];
+        // var_dump($profesores);
+
+        $headers[] = "Authorization: Bearer " . $_SESSION["token"];
+        $url = DIR_SERV . "/grupos";
+        $respuesta = consumir_servicios_JWT_REST($url, "GET", $headers);
+        $json_grupos = json_decode($respuesta, true);
+
+        if (!$json_grupos) {
+            session_destroy();
+            die(error_page("Examen Rec Final PHP", "<h1>Examen Rec Final PHP</h1><p>Error consumiendo el servicio Rest: <strong>" . $url . "</strong></p>"));
+        }
+        if (isset($json_grupos["error"])) {
+            session_destroy();
+            die(error_page("Examen Rec Final PHP", "<h1>Examen Rec Final PHP</h1><p>" . $json_grupos["error"] . "</p>"));
+        }
+        if (isset($json_grupos["no_auth"])) {
+            session_unset();
+            $_SESSION["mensaje_seguridad"] = "El tiempo de sesión de la API ha expirado";
+            header("Location:index.php");
+            exit;
+        }
+
+        $grupos = $json_grupos["grupos"];
+        // var_dump($grupos);
     }
 }
 
@@ -91,6 +136,10 @@ $aulas = $json_aulas["aulas"];
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Examen Rec Final PHP</title>
     <style>
+        body {
+            padding-bottom: 4rem;
+        }
+
         .enlinea {
             display: inline
         }
@@ -122,6 +171,15 @@ $aulas = $json_aulas["aulas"];
 
         .text-center {
             text-align: center;
+        }
+
+        .mb-0 {
+            margin-bottom: 0;
+        }
+
+        .final {
+            text-align: center;
+            margin-block: 2rem;
         }
     </style>
 </head>
@@ -193,7 +251,76 @@ $aulas = $json_aulas["aulas"];
             }
             ?>
         </table>
+        <?php
+        if (isset($_POST["btnEditar"])) {
+        ?>
+            <h2>Editando la <?= $_POST["hora"] ?>º Hora (<?= HORAS[$_POST["hora"]] ?>) del <?= DIAS[$_POST["dia"]] ?></h2>
+
+            <table>
+                <tr>
+                    <th>Profesor (Grupo)</th>
+                    <th>Acción</th>
+                </tr>
+
+                <?php
+                foreach ($profesores_aula as $key => $prof) {
+                    echo "<tr>";
+                    echo "<td>" . $prof["usuario"] . " (" . $prof["nombre"] . ")</td>";
+                ?>
+                    <td>
+                        <form action="" method="post" class="mb-0">
+                            <button type="submit" class="enlace">Quitar</button>
+                        </form>
+                    </td>
+                <?php
+                    echo "</tr>";
+                }
+                ?>
+            </table>
+
+            <div class="final">
+                <form action="" method="post">
+                    <label for="prof">Elija un profesor: </label>
+                    <select name="prof" id="prof">
+                        <?php
+                        foreach ($profesores as $key => $value) {
+
+                            if (isset($_POST["prof"]) && $value["id_usuario"] == $_POST["prof"]) {
+                                echo "<option selected value='" . $value["id_usuario"] . "'>" . $value["usuario"] . "</option>";
+                                continue;
+                            }
+
+                            echo "<option value='" . $value["id_usuario"] . "'>" . $value["usuario"] . "</option>";
+                        }
+                        ?>
+                    </select>
+
+                    <label for="grupo"> y un grupo: </label>
+                    <select name="grupo" id="grupo">
+                        <?php
+                        foreach ($grupos as $key => $value) {
+
+                            if (isset($_POST["grupo"]) && $value["id_grupo"] == $_POST["grupo"]) {
+                                $nom_aula = $value["nombre"];
+                                echo "<option selected value='" . $value["id_grupo"] . "'>" . $value["nombre"] . "</option>";
+                                continue;
+                            }
+
+                            echo "<option value='" . $value["id_grupo"] . "'>" . $value["nombre"] . "</option>";
+                        }
+                        ?>
+                    </select>
+
+                    <input type="hidden" name="aula" value="<?= $_POST["aula"] ?>">
+                    <input type="hidden" name="dia" value="<?= $j ?>">
+                    <input type="hidden" name="hora" value="<?= $i ?>">
+
+                    <button type="submit" name="btnVerAula">Añadir</button>
+                </form>
+            </div>
+
     <?php
+        }
     } ?>
 </body>
 
