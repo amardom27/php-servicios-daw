@@ -1,5 +1,5 @@
 <?php
-define("DIR_SERV", "http://localhost/Proyectos/Examen_Rec_DWESE_Final_24_25/servicios_rest");
+define("DIR_SERV", "http://localhost/Proyectos/servicios_web/Examen_Rec_DWESE_Final_24_25/servicios_rest");
 define("MINUTOS", 15);
 
 const DIAS = [1 => "Lunes", "Martes", "Miercoles", "Jueves", "Viernes"];

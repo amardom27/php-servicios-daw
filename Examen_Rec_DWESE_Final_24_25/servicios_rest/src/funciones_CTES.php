@@ -183,7 +183,7 @@ function get_profesores_aula($dia, $hora, $id_aula) {
     }
 
     try {
-        $consulta = "select usuarios.id_usuario, usuarios.usuario, grupos.id_grupo, grupos.nombre from usuarios join horario_lectivo on usuarios.id_usuario = horario_lectivo.usuario join grupos on horario_lectivo.grupo = grupos.id_grupo where horario_lectivo.dia=? and horario_lectivo.hora=? and horario_lectivo.aula=?";
+        $consulta = "select usuarios.id_usuario, usuarios.usuario, grupos.id_grupo, grupos.nombre as grupo from usuarios join horario_lectivo on usuarios.id_usuario = horario_lectivo.usuario join grupos on horario_lectivo.grupo = grupos.id_grupo where horario_lectivo.dia=? and horario_lectivo.hora=? and horario_lectivo.aula=?";
         $sentencia = $conexion->prepare($consulta);
         $sentencia->execute([$dia, $hora, $id_aula]);
     } catch (PDOException $e) {
@@ -209,7 +209,7 @@ function get_profesores() {
     }
 
     try {
-        $consulta = "select id_usuario, usuario from usuarios";
+        $consulta = "select id_usuario, usuario from usuarios where tipo = 'normal'";
         $sentencia = $conexion->prepare($consulta);
         $sentencia->execute([]);
     } catch (PDOException $e) {
@@ -246,6 +246,58 @@ function get_grupos() {
     }
 
     $respuesta["grupos"] = $sentencia->fetchAll(PDO::FETCH_ASSOC);
+
+    $sentencia = null;
+    $conexion = null;
+    return $respuesta;
+}
+
+function insertar_profesor($dia, $hora, $grupo, $usuario, $aula) {
+    try {
+        $conexion = new PDO("mysql:host=" . SERVIDOR_BD . ";dbname=" . NOMBRE_BD, USUARIO_BD, CLAVE_BD, array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES 'utf8'"));
+    } catch (PDOException $e) {
+        $respuesta["error"] = "No he podido conectarse a la base de batos: " . $e->getMessage();
+        return $respuesta;
+    }
+
+    try {
+        $consulta = "insert into horario_lectivo (usuario, dia, hora, grupo, aula) values (?,?,?,?,?)";
+        $sentencia = $conexion->prepare($consulta);
+        $sentencia->execute([$usuario, $dia, $hora, $grupo, $aula]);
+    } catch (PDOException $e) {
+        $sentencia = null;
+        $conexion = null;
+        $respuesta["error"] = "No he podido realizarse la consulta: " . $e->getMessage();
+        return $respuesta;
+    }
+
+    $respuesta["mensaje"] = "Profesor añadido con éxito.";
+
+    $sentencia = null;
+    $conexion = null;
+    return $respuesta;
+}
+
+function borrar_profesor($dia, $hora, $grupo, $usuario, $aula) {
+    try {
+        $conexion = new PDO("mysql:host=" . SERVIDOR_BD . ";dbname=" . NOMBRE_BD, USUARIO_BD, CLAVE_BD, array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES 'utf8'"));
+    } catch (PDOException $e) {
+        $respuesta["error"] = "No he podido conectarse a la base de batos: " . $e->getMessage();
+        return $respuesta;
+    }
+
+    try {
+        $consulta = "delete from horario_lectivo where usuario=? and dia=? and hora=? and grupo=? and aula=?";
+        $sentencia = $conexion->prepare($consulta);
+        $sentencia->execute([$usuario, $dia, $hora, $grupo, $aula]);
+    } catch (PDOException $e) {
+        $sentencia = null;
+        $conexion = null;
+        $respuesta["error"] = "No he podido realizarse la consulta: " . $e->getMessage();
+        return $respuesta;
+    }
+
+    $respuesta["mensaje"] = "Profesor borrado con éxito.";
 
     $sentencia = null;
     $conexion = null;

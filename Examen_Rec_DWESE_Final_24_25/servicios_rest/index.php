@@ -116,4 +116,40 @@ $app->get('/grupos', function ($request) {
     echo json_encode(get_grupos());
 });
 
+$app->post('/insertarProfesor/{dia}/{hora}/{id_grupo}/{id_usuario}/{id_aula}', function ($request) {
+
+    $test = validateToken();
+
+    if (!is_array($test) || $test["usuario"]["tipo"] !== "admin") {
+        echo json_encode(["no_auth" => "No tienes permiso para usar el servicio"]);
+        return;
+    }
+
+    $dia = $request->getAttribute("dia");
+    $hora = $request->getAttribute("hora");
+    $id_grupo = $request->getAttribute("id_grupo");
+    $id_usuario = $request->getAttribute("id_usuario");
+    $id_aula = $request->getAttribute("id_aula");
+
+    echo json_encode(insertar_profesor($dia, $hora, $id_grupo, $id_usuario, $id_aula));
+});
+
+$app->delete('/borrarProfesor/{dia}/{hora}/{id_grupo}/{id_usuario}/{id_aula}', function ($request) {
+
+    $test = validateToken();
+
+    if (!is_array($test) || $test["usuario"]["tipo"] !== "admin") {
+        echo json_encode(["no_auth" => "No tienes permiso para usar el servicio"]);
+        return;
+    }
+
+    $dia = $request->getAttribute("dia");
+    $hora = $request->getAttribute("hora");
+    $id_grupo = $request->getAttribute("id_grupo");
+    $id_usuario = $request->getAttribute("id_usuario");
+    $id_aula = $request->getAttribute("id_aula");
+
+    echo json_encode(borrar_profesor($dia, $hora, $id_grupo, $id_usuario, $id_aula));
+});
+
 $app->run();

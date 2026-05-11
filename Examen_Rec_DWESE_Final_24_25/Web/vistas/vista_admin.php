@@ -1,9 +1,85 @@
 <?php
 
+// Volver a mostrar las tablas
+if (isset($_SESSION["dia"])) {
+
+    $_POST["dia"] = $_SESSION["dia"];
+    $_POST["hora"] = $_SESSION["hora"];
+    $_POST["aula"] = $_SESSION["aula"];
+
+    unset($_SESSION["dia"]);
+    unset($_SESSION["hora"]);
+    unset($_SESSION["aula"]);
+}
+
+if (isset($_POST["btnBorrar"])) {
+
+    $headers[] = "Authorization: Bearer " . $_SESSION["token"];
+    $url = DIR_SERV . "/borrarProfesor" . "/" . $_POST["dia"] . "/" . $_POST["hora"] . "/" . $_POST["grupo"] . "/" . $_POST["prof"] . "/" . $_POST["aula"];
+    $respuesta = consumir_servicios_JWT_REST($url, "DELETE", $headers);
+    $json_borrar = json_decode($respuesta, true);
+
+    if (!$json_borrar) {
+        session_destroy();
+        die(error_page("Examen Rec Final PHP", "<h1>Examen Rec Final PHP</h1><p>Error consumiendo el servicio Rest: <strong>" . $url . "</strong></p>"));
+    }
+    if (isset($json_borrar["error"])) {
+        session_destroy();
+        die(error_page("Examen Rec Final PHP", "<h1>Examen Rec Final PHP</h1><p>" . $json_borrar["error"] . "</p>"));
+    }
+    if (isset($json_borrar["no_auth"])) {
+        session_unset();
+        $_SESSION["mensaje_seguridad"] = "El tiempo de sesión de la API ha expirado";
+        header("Location:index.php");
+        exit;
+    }
+
+    $_SESSION["mensaje_acc"] = $json_borrar["mensaje"];
+
+    $_SESSION["dia"] = $_POST["dia"];
+    $_SESSION["hora"] = $_POST["hora"];
+    $_SESSION["aula"] = $_POST["aula"];
+
+    header("Location: index.php");
+    exit;
+}
+
+if (isset($_POST["btnAgregar"])) {
+
+    $headers[] = "Authorization: Bearer " . $_SESSION["token"];
+    $url = DIR_SERV . "/insertarProfesor" . "/" . $_POST["dia"] . "/" . $_POST["hora"] . "/" . $_POST["grupo"] . "/" . $_POST["prof"] . "/" . $_POST["aula"];
+    $respuesta = consumir_servicios_JWT_REST($url, "POST", $headers);
+    $json_insertar = json_decode($respuesta, true);
+
+    if (!$json_insertar) {
+        session_destroy();
+        die(error_page("Examen Rec Final PHP", "<h1>Examen Rec Final PHP</h1><p>Error consumiendo el servicio Rest: <strong>" . $url . "</strong></p>"));
+    }
+    if (isset($json_insertar["error"])) {
+        session_destroy();
+        die(error_page("Examen Rec Final PHP", "<h1>Examen Rec Final PHP</h1><p>" . $json_insertar["error"] . "</p>"));
+    }
+    if (isset($json_insertar["no_auth"])) {
+        session_unset();
+        $_SESSION["mensaje_seguridad"] = "El tiempo de sesión de la API ha expirado";
+        header("Location:index.php");
+        exit;
+    }
+
+    $_SESSION["mensaje_acc"] = $json_insertar["mensaje"];
+
+    $_SESSION["dia"] = $_POST["dia"];
+    $_SESSION["hora"] = $_POST["hora"];
+    $_SESSION["aula"] = $_POST["aula"];
+
+    header("Location: index.php");
+    exit;
+}
+
 if (isset($_POST["aula"])) {
 
     $headers[] = "Authorization: Bearer " . $_SESSION["token"];
-    $url = DIR_SERV . "/horarioGrupo/" . $_POST["aula"];
+    $url = DIR_SERV . "/horarioGrupo" . "/" . $_POST["aula"];
     $respuesta = consumir_servicios_JWT_REST($url, "GET", $headers);
     $json_horario = json_decode($respuesta, true);
 
@@ -33,7 +109,7 @@ if (isset($_POST["aula"])) {
         $horario[$value["dia"]][$value["hora"]] = $value["usuario"] . "(" . $value["nombre"] . ")</br>";
     }
 
-    if (isset($_POST["btnEditar"])) {
+    if (isset($_POST["dia"])) {
 
         $headers[] = "Authorization: Bearer " . $_SESSION["token"];
         $url = DIR_SERV . "/profesores" . "/" . $_POST["dia"] . "/" . $_POST["hora"] . "/" . $_POST["aula"];
@@ -78,7 +154,6 @@ if (isset($_POST["aula"])) {
         }
 
         $profesores = $json_profesores["profesores"];
-        // var_dump($profesores);
 
         $headers[] = "Authorization: Bearer " . $_SESSION["token"];
         $url = DIR_SERV . "/grupos";
@@ -101,7 +176,6 @@ if (isset($_POST["aula"])) {
         }
 
         $grupos = $json_grupos["grupos"];
-        // var_dump($grupos);
     }
 }
 
@@ -137,7 +211,7 @@ $aulas = $json_aulas["aulas"];
     <title>Examen Rec Final PHP</title>
     <style>
         body {
-            padding-bottom: 4rem;
+            padding-bottom: 3rem;
         }
 
         .enlinea {
@@ -180,6 +254,10 @@ $aulas = $json_aulas["aulas"];
         .final {
             text-align: center;
             margin-block: 2rem;
+        }
+
+        .azul {
+            color: blue;
         }
     </style>
 </head>
@@ -251,10 +329,24 @@ $aulas = $json_aulas["aulas"];
             }
             ?>
         </table>
+
         <?php
-        if (isset($_POST["btnEditar"])) {
+        if (isset($_SESSION["mensaje_acc"])) {
+            echo "<p class='azul text-center'>¡¡ " . $_SESSION["mensaje_acc"] . " !!</p>";
+            unset($_SESSION["mensaje_acc"]);
+        }
         ?>
-            <h2>Editando la <?= $_POST["hora"] ?>º Hora (<?= HORAS[$_POST["hora"]] ?>) del <?= DIAS[$_POST["dia"]] ?></h2>
+
+
+        <?php
+        if (isset($_POST["dia"])) {
+
+            if ($_POST["hora"] > 3) {
+                echo "<h2>Editando la " . $_POST["hora"] - 1 . "º Hora (" . HORAS[$_POST["hora"]] . ") del " . DIAS[$_POST["dia"]] . "</h2>";
+            } else {
+                echo "<h2>Editando la " . $_POST["hora"] . "º Hora (" . HORAS[$_POST["hora"]] . ") del " . DIAS[$_POST["dia"]] . "</h2>";
+            }
+        ?>
 
             <table>
                 <tr>
@@ -265,11 +357,19 @@ $aulas = $json_aulas["aulas"];
                 <?php
                 foreach ($profesores_aula as $key => $prof) {
                     echo "<tr>";
-                    echo "<td>" . $prof["usuario"] . " (" . $prof["nombre"] . ")</td>";
+                    echo "<td>" . $prof["usuario"] . " (" . $prof["grupo"] . ")</td>";
                 ?>
                     <td>
                         <form action="" method="post" class="mb-0">
-                            <button type="submit" class="enlace">Quitar</button>
+
+                            <input type="hidden" name="aula" value="<?= $_POST["aula"] ?>">
+                            <input type="hidden" name="dia" value="<?= $_POST["dia"] ?>">
+                            <input type="hidden" name="hora" value="<?= $_POST["hora"] ?>">
+                            <input type="hidden" name="grupo" value="<?= $prof["id_grupo"] ?>">
+                            <input type="hidden" name="prof" value="<?= $prof["id_usuario"] ?>">
+
+                            <button type="submit" class="enlace" name="btnBorrar">Quitar</button>
+
                         </form>
                     </td>
                 <?php
@@ -312,10 +412,10 @@ $aulas = $json_aulas["aulas"];
                     </select>
 
                     <input type="hidden" name="aula" value="<?= $_POST["aula"] ?>">
-                    <input type="hidden" name="dia" value="<?= $j ?>">
-                    <input type="hidden" name="hora" value="<?= $i ?>">
+                    <input type="hidden" name="dia" value="<?= $_POST["dia"] ?>">
+                    <input type="hidden" name="hora" value="<?= $_POST["hora"] ?>">
 
-                    <button type="submit" name="btnVerAula">Añadir</button>
+                    <button type="submit" name="btnAgregar">Añadir</button>
                 </form>
             </div>
 
